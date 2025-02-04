@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,8 +13,25 @@ import { Slider } from "@/components/ui/slider";
 import { Users, ArrowRight } from "lucide-react";
 import Convert from "./Convert";
 import CurrencySelect from "./CurrencySelect";
+import { UserButton } from "@clerk/nextjs";
 
 export default function BillSplitter() {
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/service-worker.js", { scope: "/" })
+        .then((registration) =>
+          console.log(
+            "service worker registered successfully, scope is: ",
+            registration.scope,
+          ),
+        )
+        .catch((error) => {
+          console.error("Service worker registration failed", error);
+        });
+    }
+  }, []);
+
   const [globalCurrency, setGlobalCurrency] = useState("USD");
   const [billAmount, setBillAmount] = useState("");
   const [numPeople, setNumPeople] = useState(2);
@@ -28,12 +45,23 @@ export default function BillSplitter() {
     return totalAmount / numPeople;
   };
 
+  const calculateNumPeople = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value) {
+      setNumPeople(parseInt(e.target.value));
+    } else {
+      setNumPeople(0);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <Card className="w-full md:max-w-md bg-white shadow-lg rounded-2xl">
         <CardHeader>
-          <CardTitle className="text-2xl font-semibold text-center text-gray-800">
-            Split the Bill
+          <CardTitle>
+            <div className="text-2xl font-semibold text-center text-gray-800 flex justify-between">
+              <span>Split the Bill</span>
+              <UserButton />
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -71,7 +99,7 @@ export default function BillSplitter() {
                 type="number"
                 min="1"
                 value={numPeople}
-                onChange={(e) => setNumPeople(parseInt(e.target.value))}
+                onChange={calculateNumPeople}
                 className="w-20 text-center border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -119,6 +147,20 @@ export default function BillSplitter() {
           <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 ease-in-out flex items-center justify-center">
             Split Bill
             <ArrowRight className="ml-2" size={18} />
+          </Button>
+          <Button
+            className="w-full bg-red-400 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 ease-in-out flex items-center justify-center"
+            onClick={() => {
+              navigator.serviceWorker
+                .getRegistrations()
+                .then((registrations) => {
+                  for (const registration of registrations) {
+                    registration.unregister();
+                  }
+                });
+            }}
+          >
+            Log out
           </Button>
         </CardFooter>
       </Card>
