@@ -6,6 +6,11 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* disable allowing users to change their username */
+.cl-profileSection__username {
+  display: none;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

@@ -1,15 +1,20 @@
-import BillSplitter from "./_components/BillSplitter";
+import { auth } from "@clerk/nextjs/server";
 import { SignedIn, SignedOut } from "@clerk/nextjs";
-import LoginPage from "./_components/LoginPage";
+import { redirect } from "next/navigation";
+import ExpenseSplitCard from "./_components/SplitCard";
 
 async function Home() {
+  const { userId } = await auth();
+  if (!userId) {
+    redirect("/sign-in");
+  }
   return (
     <div>
-      <SignedOut>
-        <LoginPage />
-      </SignedOut>
+      <SignedOut></SignedOut>
       <SignedIn>
-        <BillSplitter />
+        <div className="flex justify-center items-center h-screen">
+          <ExpenseSplitCard />
+        </div>
       </SignedIn>
     </div>
   );

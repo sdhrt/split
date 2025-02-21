@@ -6,7 +6,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { iso4217CurrencyCodes } from "./currency";
+import { iso4217CurrencyCodes } from "@/lib/currency";
 
 function CurrencySelect({
   setCurrency,

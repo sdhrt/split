@@ -22,7 +22,7 @@ function Convert({
   useEffect(() => {
     fetch(
       `https://v6.exchangerate-api.com/v6/e3e0dc65e1689bd107957462/pair/${globalCurrency}/${currency}`,
-      { cache: "force-cache" },
+      { cache: "force-cache", method: "GET" },
     )
       .then((res) => res.json())
       .then((res) => {
