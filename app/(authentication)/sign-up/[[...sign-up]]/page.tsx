@@ -11,7 +11,7 @@ import { UserRoundX } from "lucide-react";
 
 export default function SignUpPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
@@ -21,7 +21,7 @@ export default function SignUpPage() {
 
     const res = await fetch("/api/signup", {
       method: "POST",
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ email, password }),
     });
     const response = await res.json();
     const { error } = response;
@@ -42,12 +42,12 @@ export default function SignUpPage() {
         </div>
         <form onSubmit={handleSignUp} className="space-y-6">
           <div>
-            <Label className="mb-1 font-semibold text-xs">Username</Label>
+            <Label className="mb-1 font-semibold text-xs">Email address</Label>
             <Input
-              id="username"
+              id="email"
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
               className="focus:ring-2 focus:ring-blue-500 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,_0,_0,_1)]"
             />

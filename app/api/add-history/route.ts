@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   const body: {
-    users: Array<{ name: String; percentage: Number }>;
+    users: Array<{ email: String; percentage: Number }>;
     initiator: string;
     amount: Number;
   } = await req.json();
@@ -15,13 +15,13 @@ export async function POST(req: NextRequest) {
     const historyTx: Array<{ user: any; split: Number }> = [];
 
     const addHistory = async ({
-      name,
+      email,
       percentage,
     }: {
-      name: String;
+      email: String;
       percentage: Number;
     }) => {
-      const { _id } = await UserModel.findOne({ username: name }, "-password");
+      const { _id } = await UserModel.findOne({ email }, "-password");
       const obj = { user: await _id, split: percentage };
       historyTx.push(obj);
     };
@@ -30,25 +30,14 @@ export async function POST(req: NextRequest) {
       await addHistory(body.users[i]);
     }
 
-    const { _id } = await UserModel.findOne({ username: body.initiator });
+    const mongoId = await UserModel.findOne({ email: body.initiator });
 
     const newHistory = new HistoryModel({
-      initiator: _id,
+      initiator: mongoId,
       history: historyTx,
       amount: body.amount,
     });
 
-    // const duplicateHistory = await HistoryModel.findOne({
-    //   initiator: _id,
-    //   history: historyTx,
-    // });
-    // console.log(`duplicateHistory:::::${duplicateHistory}`);
-    //
-    // return NextResponse.json({
-    //   error: false,
-    //   message: "Added to history",
-    // });
-    //
     const { _id: historyId } = await newHistory.save();
     if (historyId) {
       return NextResponse.json({
@@ -62,6 +51,7 @@ export async function POST(req: NextRequest) {
       });
     }
   } catch (error: any) {
+    console.log(error);
     return NextResponse.json({
       error: true,
       message: "Error occured",

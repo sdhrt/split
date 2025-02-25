@@ -18,9 +18,9 @@ function People({
   setSearchQuery: (arg0: string) => void;
   searchResults: IUser[];
   setSearchResults: (arg0: IUser[]) => void;
-  selectedPersons: Array<{ name: string; percentage: number }>;
+  selectedPersons: Array<{ email: string; percentage: number }>;
   setSelectedPersons: (
-    arg0: Array<{ name: string; percentage: number }>,
+    arg0: Array<{ email: string; percentage: number }>,
   ) => void;
 }) {
   useEffect(() => {
@@ -28,7 +28,7 @@ function People({
       if (searchQuery.length > 0) {
         const res = await fetch("/api/getusers", {
           method: "POST",
-          body: JSON.stringify({ username: searchQuery.toLowerCase() }),
+          body: JSON.stringify({ email: searchQuery.toLowerCase() }),
         });
         const { users } = await res.json();
         setSearchResults(users);
@@ -38,9 +38,9 @@ function People({
     })();
   }, [searchQuery]);
 
-  const handleAddPerson = (name: string) => {
-    if (!selectedPersons.some((person) => person.name === name)) {
-      setSelectedPersons([...selectedPersons, { name, percentage: 0 }]);
+  const handleAddPerson = (email: string) => {
+    if (!selectedPersons.some((person) => person.email === email)) {
+      setSelectedPersons([...selectedPersons, { email, percentage: 0 }]);
       setSearchQuery("");
     } else {
       toast({
@@ -51,16 +51,16 @@ function People({
     }
   };
 
-  const handleRemovePerson = (name: string) => {
+  const handleRemovePerson = (email: string) => {
     setSelectedPersons(
-      selectedPersons.filter((person) => person.name !== name),
+      selectedPersons.filter((person) => person.email !== email),
     );
   };
 
-  const handlePercentageChange = (name: string, percentage: number) => {
+  const handlePercentageChange = (email: string, percentage: number) => {
     setSelectedPersons(
       selectedPersons.map((person) =>
-        person.name === name ? { ...person, percentage } : person,
+        person.email === email ? { ...person, percentage } : person,
       ),
     );
   };
@@ -68,7 +68,7 @@ function People({
   return (
     <div>
       <div className="relative">
-        <Label htmlFor="name-search">Search Names</Label>
+        <Label htmlFor="name-search">Search (email)</Label>
         <Input
           id="name-search"
           type="text"
@@ -83,9 +83,9 @@ function People({
                 // @ts-ignore
                 key={user._id}
                 className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                onClick={() => handleAddPerson(user.username)}
+                onClick={() => handleAddPerson(user.email)}
               >
-                {user.username}
+                {user.email}
               </li>
             ))}
           </ul>
@@ -95,13 +95,13 @@ function People({
       <div className="my-2">
         <h3 className="font-semibold mb-2">Selected Persons</h3>
         {selectedPersons.map((person) => (
-          <div key={person.name} className="flex items-center space-x-2 mb-2">
-            <span className="flex-grow">{person.name}</span>
+          <div key={person.email} className="flex items-center space-x-2 mb-2">
+            <span className="flex-grow">{person.email}</span>
             <Input
               type="number"
               value={person.percentage}
               onChange={(e) =>
-                handlePercentageChange(person.name, Number(e.target.value))
+                handlePercentageChange(person.email, Number(e.target.value))
               }
               className="w-20"
               min="0"
@@ -111,7 +111,7 @@ function People({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handleRemovePerson(person.name)}
+              onClick={() => handleRemovePerson(person.email)}
             >
               <X className="h-4 w-4" />
             </Button>

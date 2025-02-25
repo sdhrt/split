@@ -2,12 +2,12 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 export interface IUser extends mongoose.Document {
-  username: string;
+  email: string;
   password: string;
 }
 
 const userSchema = new Schema({
-  username: {
+  email: {
     type: String,
     index: true,
     unique: true,

@@ -7,7 +7,7 @@ body {
 }
 
 /* disable allowing users to change their username */
-.cl-profileSection__username {
+.cl-profileSection__emailAddresses {
   display: none;
 }
 

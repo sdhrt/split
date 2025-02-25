@@ -19,7 +19,7 @@ export default function ExpenseSplitCard() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [searchResults, setSearchResults] = useState<IUser[]>([]);
   const [selectedPersons, setSelectedPersons] = useState<
-    { name: string; percentage: number }[]
+    { email: string; percentage: number }[]
   >([]);
 
   const totalPercentage = selectedPersons.reduce(
@@ -33,7 +33,7 @@ export default function ExpenseSplitCard() {
         method: "POST",
         body: JSON.stringify({
           users: selectedUsers,
-          initiator: user.username,
+          initiator: user.primaryEmailAddress?.emailAddress,
           amount: totalAmount,
         }),
       });
@@ -117,10 +117,10 @@ export default function ExpenseSplitCard() {
             <h3 className="font-semibold mb-2">Split Amount</h3>
             {selectedPersons.map((person) => (
               <div
-                key={person.name}
+                key={person.email}
                 className="flex justify-between items-center mb-1"
               >
-                <span>{person.name}:</span>
+                <span>{person.email}:</span>
                 <span>
                   ${((totalAmount * person.percentage) / 100).toFixed(2)}
                 </span>

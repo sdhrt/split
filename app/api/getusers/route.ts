@@ -3,14 +3,14 @@ import { UserModel } from "@/schema/user";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const { username } = await req.json();
+  const { email } = await req.json();
   await connectMongo();
 
   const users = await UserModel.find(
     {
-      username: new RegExp(username, "i"),
+      email: new RegExp(email, "i"),
     },
-    "username , _id",
+    "email , _id",
   ).exec();
 
   if (users) {

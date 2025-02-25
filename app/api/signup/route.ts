@@ -3,13 +3,17 @@ import { UserModel } from "@/schema/user";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
+import bcrypt from "bcrypt";
+
 export async function POST(req: NextRequest) {
-  const { username, password } = await req.json();
+  const { email, password } = await req.json();
   try {
     const client = await clerkClient();
     await connectMongo();
 
-    const mongoUser = await UserModel.findOne({ username });
+    const hashedPass = await bcrypt.hash(password, 10);
+
+    const mongoUser = await UserModel.findOne({ email });
 
     if (mongoUser) {
       return NextResponse.json({
@@ -18,30 +22,28 @@ export async function POST(req: NextRequest) {
     }
 
     const newUser = new UserModel({
-      username,
-      password,
+      email,
+      password: hashedPass,
     });
 
-    const { username: u } = await newUser.save();
-    await client.users.createUser({
-      username: u,
+    const { _id } = await newUser.save();
+    const { id } = await client.users.createUser({
+      emailAddress: [email],
       password: password,
     });
 
-    // const { id: i } = await client.users.deleteUser(id);
-    // if (i) {
-    //   console.log("deleted from clerk");
-    // }
-    //
-    // const { acknowledged } = await UserModel.deleteOne({ username });
-    // if (acknowledged) {
-    //   console.log("deleted from mongodb");
-    // }
+    if (!id) {
+      console.log("deleted mongodb user");
+      await UserModel.findByIdAndDelete(_id);
+    }
 
     return NextResponse.json({
       error: null,
     });
   } catch (error: any) {
+    console.log("error", error);
+    console.error(error);
+    console.log(error.errors);
     return NextResponse.json({
       error: "Server error",
     });
